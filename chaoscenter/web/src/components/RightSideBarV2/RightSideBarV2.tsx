@@ -48,20 +48,19 @@ function RightSideBarV2({
   refetchExperimentRuns
 }: RightSideBarViewV2Props): React.ReactElement {
   const { showError } = useToaster();
-  let experimentList: ListExperimentResponse | undefined;
-  if (experimentType === ExperimentType.CRON) {
-    const scope = getScope();
-    const { data: experimentListData } = listExperiment({
-      ...scope,
-      experimentIDs: [experimentID],
-      options: {
-        onError: err => showError(err.message),
-        fetchPolicy: 'network-only'
-      }
-    });
+  const scope = getScope();
+  const { data: experimentListData } = listExperiment({
+    ...scope,
+    experimentIDs: [experimentID],
+    options: {
+      onError: err => showError(err.message),
+      fetchPolicy: 'network-only',
+      skip: experimentType !== ExperimentType.CRON
+    }
+  });
 
-    experimentList = experimentListData;
-  }
+  const experimentList: ListExperimentResponse | undefined =
+    experimentType === ExperimentType.CRON ? experimentListData : undefined;
 
   React.useEffect(() => {
     if (experimentList !== undefined) {
